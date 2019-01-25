@@ -10,6 +10,7 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   names(navDf) = c("nav" , "date")
   
   navDf$date = as.Date(navDf$date , format = "%d-%b-%Y")
+  navDf$nav = as.numeric(navDf$nav)
   return(navDf)
 }
 
@@ -73,8 +74,7 @@ reverseGrep <- function(mianStr, matchStrs){
   if(length(matches) ==0){
     return(NA)
   } else {
-      return(paste(matches , collapse = ","))
+    return(paste(matches , collapse = ","))
   }
-
+  
 }
-
