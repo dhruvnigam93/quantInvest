@@ -1,13 +1,15 @@
 source("funs.R")
 library(rvest)
 library(PortfolioAnalytics)
+
+#### Define Portfolio ####
 portCodes = c("107745" , "119205" , "118539")
 weights = c(0.2,0.2,0.6)
 
+
+#### Historic Portfolio Performance ####
 schemeCodes = getAllSchemeMFCodes()
-
 portDF = schemeCodes[schemeCodes$`Scheme Code` %in% portCodes,]
-
 allNAV = list()
 
 for( i in 1:(length(portCodes))){
@@ -16,11 +18,23 @@ for( i in 1:(length(portCodes))){
 }
 
 names(allNAV) = portCodes
-
 allNAVZoo = do.call("merge",lapply( allNAV , function(x) zoo(x = x$nav,order.by = x$date) ))
-
 returnZoo = Return.calculate(allNAVZoo)
-
 pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
 
-plot(pf_rebal$returns)
+mean_return = mean(pf_rebal$returns , na.rm = T)
+sd_return = sd(pf_rebal$returns , na.rm = T)
+
+#### Portfolio Projections ####
+n = 5 # Holding period in years
+
+nDays = (1:(n*252))
+nYears = nDays/252
+projectedAvgRet = (1 +mean_return)^nDays
+projecctedSd = sqrt((1 + (sd_return)^2)^nDays - 1)
+
+predFrame = data.frame(years = nYears , return = projectedAvgRet , yhigh = projectedAvgRet + projecctedSd, ylow = projectedAvgRet - projecctedSd)
+
+pl = ggplot(predFrame , aes(x = years , y = return)) + geom_line() + 
+  geom_ribbon(data = predFrame , aes(ymin = ylow , ymax = yhigh) , alpha = 0.3)
+
