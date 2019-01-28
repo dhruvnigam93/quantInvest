@@ -20,10 +20,15 @@ for( i in 1:(length(portCodes))){
 names(allNAV) = portCodes
 allNAVZoo = do.call("merge",lapply( allNAV , function(x) zoo(x = x$nav,order.by = x$date) ))
 returnZoo = Return.calculate(allNAVZoo)
+
+returnZoo = returnZoo[max(apply(returnZoo ,2, function(x) ( min( which(!is.na(x)) ) ))) : nrow(returnZoo),]
+
 pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
 
-mean_return = mean(pf_rebal$returns , na.rm = T)
+mean_returan = mean(pf_rebal$returns , na.rm = T)
 sd_return = sd(pf_rebal$returns , na.rm = T)
+
+plot_historic = plot(cumprod(1 + pf_rebal$returns) ,main = "Historic Performance")
 
 #### Portfolio Projections ####
 n = 5 # Holding period in years
@@ -37,4 +42,6 @@ predFrame = data.frame(years = nYears , return = projectedAvgRet , yhigh = proje
 
 pl = ggplot(predFrame , aes(x = years , y = return)) + geom_line() + 
   geom_ribbon(data = predFrame , aes(ymin = ylow , ymax = yhigh) , alpha = 0.3)
+
+
 
