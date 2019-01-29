@@ -1,20 +1,41 @@
 library(shiny)
+library(rvest)
+library(PortfolioAnalytics)
+source('H:/R Workspace/project-x/funs.R')
+source('H:/R Workspace/project-x/portfolioAnalytics.R')
 
-# Define UI for miles per gallon app ----
-ui <- pageWithSidebar(
+# Use a fluid Bootstrap layout
+ui <- fluidPage(    
   
-  # App title ----
-  headerPanel("Miles Per Gallon"),
+  # Give the page a title
+  titlePanel("Historic Portfolio Performance"),
   
-  # Sidebar panel for inputs ----
-  sidebarPanel(),
-  
-  # Main panel for displaying outputs ----
-  mainPanel()
+  # Generate a row with a sidebar
+  sidebarLayout(      
+    
+    # Define the sidebar with one input
+    sidebarPanel(
+      selectInput(inputId = "mf1", label = "Fund Name:", 
+                  choices=getAllSchemeCodes()$`Scheme Name`),
+      hr(),
+      selectInput(inputId = "mf2", label = "Fund Name:", 
+                  choices=getAllSchemeCodes()$`Scheme Name`),
+      hr()
+    ),
+    
+    # Create a spot for the barplot
+    mainPanel(
+      plotOutput(outputId = "phonePlot")  
+    )
+    
+  )
 )
 
 # Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
+  mfNames = c(input$mf1 , input$mf2)
+  
+  
   
 }
 
