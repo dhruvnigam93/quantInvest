@@ -8,17 +8,18 @@
 
 
 #### Historic Portfolio Performance ####
-getHistoricPerf <- function(mfNames , weights){
-schemeCodes = getAllSchemeMFCodes()
+getHistoricPerf <- function(mfNames , weights, schemeCodes){
+
 portDF = schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,]
 allNAV = list()
 
+print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
 for( i in 1:(length(mfNames))){
   dataTemp = getHistNAV(mfcode = portDF$Code[i],scmCode = portDF$`Scheme Code`[i],startDate = as.Date("1995-01-01"), endDate = Sys.Date())
   allNAV = c(allNAV , list(dataTemp))  
 }
 
-names(allNAV) = mfNames
+names(allNAV) = portDF$`Scheme Code`
 allNAVZoo = do.call("merge",lapply( allNAV , function(x) zoo(x = x$nav,order.by = x$date) ))
 returnZoo = Return.calculate(allNAVZoo)
 
@@ -31,7 +32,7 @@ sd_return = sd(pf_rebal$returns , na.rm = T)
 
 plot_historic = plot(cumprod(1 + pf_rebal$returns) ,main = "Historic Performance")
 
-return(list(mean_return,sd_return,plot_historic))
+return(list(mean_return = mean_return,sd_return = sd_return,plot_historic = plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 
 # #### Portfolio Projections ####

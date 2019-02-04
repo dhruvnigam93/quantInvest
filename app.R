@@ -1,8 +1,9 @@
 library(shiny)
 library(rvest)
 library(PortfolioAnalytics)
-source('H:/R Workspace/project-x/funs.R')
-source('H:/R Workspace/project-x/portfolioAnalytics.R')
+source('funs.R')
+source('portfolioAnalytics.R')
+schemeCodes = getAllSchemeMFCodes()
 
 # Use a fluid Bootstrap layout
 ui <- fluidPage(    
@@ -25,7 +26,7 @@ ui <- fluidPage(
     
     # Create a spot for the barplot
     mainPanel(
-      plotOutput(outputId = "phonePlot")  
+      plotOutput(outputId = "histPerfPlot")  
     )
     
   )
@@ -33,9 +34,15 @@ ui <- fluidPage(
 
 # Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
-  mfNames = c(input$mf1 , input$mf2)
-  
-  
+  output$histPerfPlot <- renderPlot({
+    mfNames = c(input$mf1 , input$mf2)
+    x = getHistoricPerf(mfNames, c(0.5,0.5),schemeCodes)
+    logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
+    logNameFileName = gsub("data","mfNames" , logDataFileName)
+    write.csv(x$pfRetrns , file = paste0("data audit/",logDataFileName))
+    write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("data audit/",logNameFileName))
+    x$plot_historic
+  })
   
 }
 
