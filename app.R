@@ -21,7 +21,8 @@ ui <- fluidPage(
       hr(),
       selectInput(inputId = "mf2", label = "Fund Name:", 
                   choices=getAllSchemeCodes()$`Scheme Name`),
-      hr()
+      hr(),
+      actionButton("do", "update")
     ),
     
     # Create a spot for the barplot
@@ -34,14 +35,16 @@ ui <- fluidPage(
 
 # Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
+  observeEvent(input$do , {
   output$histPerfPlot <- renderPlot({
     mfNames = c(input$mf1 , input$mf2)
     x = getHistoricPerf(mfNames, c(0.5,0.5),schemeCodes)
     logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
     logNameFileName = gsub("data","mfNames" , logDataFileName)
-    write.csv(x$pfRetrns , file = paste0("data audit/",logDataFileName))
-    write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("data audit/",logNameFileName))
+    write.csv(as.data.frame(x$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
+    write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
     x$plot_historic
+  })
   })
   
 }
