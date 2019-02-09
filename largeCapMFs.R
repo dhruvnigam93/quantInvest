@@ -1,4 +1,4 @@
-source('~/MutualFundBenchmarking/funs.R')
+source('funs.R')
 library(plyr)
 
 allSchemeData = getAllSchemeMFCodes()

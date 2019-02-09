@@ -36,15 +36,15 @@ ui <- fluidPage(
 # Define server logic to plot various variables against mpg ----
 server <- function(input, output) {
   observeEvent(input$do , {
-  output$histPerfPlot <- renderPlot({
-    mfNames = c(input$mf1 , input$mf2)
-    x = getHistoricPerf(mfNames, c(0.5,0.5),schemeCodes)
-    logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
-    logNameFileName = gsub("data","mfNames" , logDataFileName)
-    write.csv(as.data.frame(x$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
-    write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
-    x$plot_historic
-  })
+    output$histPerfPlot <- renderPlot({
+      mfNames = isolate(c(input$mf1 , input$mf2))
+      x = getHistoricPerf(mfNames, c(0.5,0.5),schemeCodes)
+      logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
+      logNameFileName = gsub("data","mfNames" , logDataFileName)
+      write.csv(as.data.frame(x$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
+      write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
+      x$plot_historic
+    })
   })
   
 }

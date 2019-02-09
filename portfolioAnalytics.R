@@ -10,11 +10,11 @@
 #### Historic Portfolio Performance ####
 getHistoricPerf <- function(mfNames , weights, schemeCodes){
 
-portDF = schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,]
+portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
 allNAV = list()
 
 print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
-for( i in 1:(length(mfNames))){
+for( i in 1:(nrow(portDF))){
   dataTemp = getHistNAV(mfcode = portDF$Code[i],scmCode = portDF$`Scheme Code`[i],startDate = as.Date("1995-01-01"), endDate = Sys.Date())
   allNAV = c(allNAV , list(dataTemp))  
 }
