@@ -16,12 +16,20 @@ ui <- fluidPage(
     
     # Define the sidebar with one input
     sidebarPanel(
+      numericInput(inputId = "nFunds" , label = "Number of Funds:",value = 2),
+      hr(),
       selectInput(inputId = "mf1", label = "Fund Name:", 
                   choices=getAllSchemeCodes()$`Scheme Name`),
+      numericInput(inputId = "w1" , label = "Capital Invested:",value = 100),
       hr(),
       selectInput(inputId = "mf2", label = "Fund Name:", 
                   choices=getAllSchemeCodes()$`Scheme Name`),
+      numericInput(inputId = "w2" , label = "Capital Invested:",value = 100),
       hr(),
+      selectInput(inputId = "rebalancePeriod", label = "Rebalance Frequency:", 
+                  choices=c("Yearly", "Monthly" , "Never")),
+      selectInput(inputId = "InvestmentMode", label = "Mode of Investment:", 
+                  choices=c("Monthly SIP" , "Lump sum")),
       actionButton("do", "update")
     ),
     
@@ -33,7 +41,7 @@ ui <- fluidPage(
   )
 )
 
-# Define server logic to plot various variables against mpg ----
+#### Define server logic to plot various variables against mpg #### 
 server <- function(input, output) {
   observeEvent(input$do , {
     output$histPerfPlot <- renderPlot({
