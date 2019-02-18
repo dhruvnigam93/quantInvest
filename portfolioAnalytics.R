@@ -20,24 +20,22 @@ getHistoricReturns <- function(mfDf){
     dataTemp = getHistNAV(mfcode = mfDf$Code[i],scmCode = mfDf$`Scheme Code`[i],startDate = as.Date("1995-01-01"), endDate = Sys.Date())
     allNAV = c(allNAV , list(dataTemp))  
   }
-  
   names(allNAV) = mfDf$`Scheme Code`
   allNAVZoo = do.call("merge",lapply( allNAV , function(x) zoo(x = x$nav,order.by = x$date) ))
   returnZoo = Return.calculate(allNAVZoo)
   if(length(allNAV)!=1){
   returnZoo = returnZoo[max(apply(returnZoo ,2, function(x) ( min( which(!is.na(x)) ) ))) : nrow(returnZoo),]
   }
+  returnZoo = na.fill(returnZoo,0)
   return(returnZoo)
   
 }
 
-getSIPreturns <- function(returnZoo){
-  monthStarts = as.Date(seq((as.yearmon(min(attributes(returnZoo)$index)) + 1/12), (as.yearmon(max(attributes(returnZoo)$index))) , 1/12))
-  allDates= zoo( 0 , seq(monthStarts[1], max(attributes(returnZoo)$index),1))
-  temp = lapply( as.list(monthStarts) , function(x) { allDatesNew = allDates
-    allDatesNew[index(allDatesNew) == x[[1]]] <-  1  
-                 (allDatesNew) })
-  zoo( 0 , seq(monthStarts[1], max(attributes(returnZoo)$index),1))
+getSIPreturns <- function(simpleReturnZoo){
+  monthStarts = as.Date(seq((as.yearmon(min(attributes(simpleReturnZoo)$index)) + 1/12), (as.yearmon(max(attributes(simpleReturnZoo)$index))) , 1/12))
+  sipReturnList = lapply(as.list(monthStarts) , function(x) { cumprod(1 + simpleReturnZoo[index(simpleReturnZoo) >= x[1]]) } )
+  simReturnCum = do.call("merge",sipReturnList)
+  tt = zoo(rowSums(simReturnCum , na.rm = T) , time(simReturnCum))
 }
 
 
