@@ -33,7 +33,10 @@ getHistoricReturns <- function(mfDf){
 
 getSIPreturns <- function(returnZoo){
   monthStarts = as.Date(seq((as.yearmon(min(attributes(returnZoo)$index)) + 1/12), (as.yearmon(max(attributes(returnZoo)$index))) , 1/12))
-  
+  allDates= zoo( 0 , seq(monthStarts[1], max(attributes(returnZoo)$index),1))
+  temp = lapply( as.list(monthStarts) , function(x) { allDatesNew = allDates
+    allDatesNew[index(allDatesNew) == x[[1]]] <-  1  
+                 (allDatesNew) })
   zoo( 0 , seq(monthStarts[1], max(attributes(returnZoo)$index),1))
 }
 
