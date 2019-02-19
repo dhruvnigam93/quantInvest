@@ -1,10 +1,29 @@
-#### Historic Portfolio Performance ####
+#### Historic Portfolio Performance Lumpsum####
 getHistoricPerf <- function(mfNames , weights, schemeCodes){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
   returnZoo <- getHistoricReturns(portDF)
   pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
+  
+  mean_return = mean(pf_rebal$returns , na.rm = T)
+  sd_return = sd(pf_rebal$returns , na.rm = T)
+  
+  plot_historic = plot(cumprod(1 + pf_rebal$returns) ,main = "Historic Performance")
+  
+  return(list(mean_return = mean_return,sd_return = sd_return,plot_historic = plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
+}
+
+#### Historic Portfolio Performance SIP####
+getHistoricPerf <- function(mfNames , weights, schemeCodes){
+  
+  portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
+  print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
+  returnZoo <- getHistoricReturns(portDF)
+  sipPortfolioRerurnsList <- lapply(as.list(returnZoo) , getSIPreturns)
+  sipPortfolioReturnZoo = do.call("merge",sipRerurnsList)
+  
+  sipTotalReturn = zoo(rowSums(sipPortfolioReturnZoo , na.rm = T) , time(sipPortfolioReturnZoo))
   
   mean_return = mean(pf_rebal$returns , na.rm = T)
   sd_return = sd(pf_rebal$returns , na.rm = T)
@@ -34,8 +53,9 @@ getHistoricReturns <- function(mfDf){
 getSIPreturns <- function(simpleReturnZoo){
   monthStarts = as.Date(seq((as.yearmon(min(attributes(simpleReturnZoo)$index)) + 1/12), (as.yearmon(max(attributes(simpleReturnZoo)$index))) , 1/12))
   sipReturnList = lapply(as.list(monthStarts) , function(x) { cumprod(1 + simpleReturnZoo[index(simpleReturnZoo) >= x[1]]) } )
-  simReturnCum = do.call("merge",sipReturnList)
-  tt = zoo(rowSums(simReturnCum , na.rm = T) , time(simReturnCum))
+  sipReturnCum = do.call("merge",sipReturnList)
+  sipReturn = zoo(rowSums(sipReturnCum , na.rm = T) , time(sipReturnCum))
+  return(sipReturn)
 }
 
 
