@@ -1,5 +1,5 @@
 #### Historic Portfolio Performance Lumpsum####
-getHistoricPerf <- function(mfNames , weights, schemeCodes){
+getHistoricPerfLump <- function(mfNames , weights, schemeCodes){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
@@ -15,7 +15,7 @@ getHistoricPerf <- function(mfNames , weights, schemeCodes){
 }
 
 #### Historic Portfolio Performance SIP####
-getHistoricPerf <- function(mfNames , weights, schemeCodes){
+getHistoricPerfSIP <- function(mfNames , weights, schemeCodes){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
