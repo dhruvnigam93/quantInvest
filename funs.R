@@ -80,6 +80,7 @@ reverseGrep <- function(mianStr, matchStrs){
 }
 
 writeLog <- function(){
+print(environment())
 logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
 logNameFileName = gsub("data","mfNames" , logDataFileName)
 write.csv(as.data.frame(perfData$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))

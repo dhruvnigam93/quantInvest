@@ -53,8 +53,8 @@ server <- function(input, output) {
       } else{
         perfData = getHistoricPerfLump(mfNames, c(0.5,0.5),schemeCodes)
       }
-      
-      # writeLog()
+      assign("perfData", "perfData", envir = .GlobalEnv)
+      writeLog()
       perfData$plot_historic
     })
   })
