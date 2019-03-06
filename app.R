@@ -48,6 +48,8 @@ server <- function(input, output) {
       mfNames = isolate(c(input$mf1 , input$mf2))
       modeInvest = isolate( ifelse(input$investmentMode=="Monthly SIP", 1,0) )
       
+      if(any(duplicated(mfNames))) stop("Multiple entries for same fund") ## Throw error if multiple entries for same fund
+      
       if(modeInvest == 1){
         perfData = getHistoricPerfSIP(mfNames, c(0.5,0.5),schemeCodes)
       } else{

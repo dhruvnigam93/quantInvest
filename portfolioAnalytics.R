@@ -1,17 +1,15 @@
-#### Historic Portfolio Performance Lumpsum####
+#### Historic Portfolio Performance Lumpsum ####
 getHistoricPerfLump <- function(mfNames , weights, schemeCodes){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
-  print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
-  returnZoo <- getHistoricReturns(portDF)
+
+    print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
+  
+  returnZoo <- getSimpleHistoricReturns(portDF)
   pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
   
-  mean_return = mean(pf_rebal$returns , na.rm = T)
-  sd_return = sd(pf_rebal$returns , na.rm = T)
-  
-  plot_historic = plot(cumprod(1 + pf_rebal$returns) ,main = "Historic Performance")
-  
-  return(list(mean_return = mean_return,sd_return = sd_return,plot_historic = plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
+  processedResults = postProcessFolioReturns(pf_rebal$returns)
+  return(list(numericMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 
 #### Historic Portfolio Performance SIP####
@@ -19,38 +17,36 @@ getHistoricPerfSIP <- function(mfNames , weights, schemeCodes){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
-  returnZoo <- getHistoricReturns(portDF)
-  sipPortfolioRerurnsList <- lapply(as.list(returnZoo) , getSIPreturns)
-  sipPortfolioReturnZoo = do.call("merge",sipRerurnsList)
+  returnZoo <- getSimpleHistoricReturns(portDF)
+  
+  sipPortfolioReturnsList <- lapply(as.list(returnZoo) , calculateSIPreturns)
+  sipPortfolioReturnZoo = do.call("merge",sipPortfolioReturnsList)
   
   sipTotalReturn = zoo(rowSums(sipPortfolioReturnZoo , na.rm = T) , time(sipPortfolioReturnZoo))
-  
-  mean_return = mean(pf_rebal$returns , na.rm = T)
-  sd_return = sd(pf_rebal$returns , na.rm = T)
-  
-  plot_historic = plot(cumprod(1 + pf_rebal$returns) ,main = "Historic Performance")
-  
-  return(list(mean_return = mean_return,sd_return = sd_return,plot_historic = plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
+  processedResults = postProcessFolioReturns(sipTotalReturn)
+  return(list(nummercMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(sipPortfolioReturnZoo , sipTotalReturn)))
 }
 
-getHistoricReturns <- function(mfDf){
+getSimpleHistoricReturns <- function(mfDf){
   allNAV = list()
   for( i in 1:(nrow(mfDf))){
     dataTemp = getHistNAV(mfcode = mfDf$Code[i],scmCode = mfDf$`Scheme Code`[i],startDate = as.Date("1995-01-01"), endDate = Sys.Date())
     allNAV = c(allNAV , list(dataTemp))  
   }
   names(allNAV) = mfDf$`Scheme Code`
-  allNAVZoo = do.call("merge",lapply( allNAV , function(x) zoo(x = x$nav,order.by = x$date) ))
+  
+  #### Create combined zoo object ####
+  allNAVZoo = do.call("merge",lapply( allNAV , function(x){ zoo(x = x[!duplicated(x),]$nav,order.by = x[!duplicated(x),]$date)  } ))
   returnZoo = Return.calculate(allNAVZoo)
   if(length(allNAV)!=1){
-  returnZoo = returnZoo[max(apply(returnZoo ,2, function(x) ( min( which(!is.na(x)) ) ))) : nrow(returnZoo),]
+    returnZoo = returnZoo[max(apply(returnZoo ,2, function(x) ( min( which(!is.na(x)) ) ))) : nrow(returnZoo),]
   }
   returnZoo = na.fill(returnZoo,0)
   return(returnZoo)
   
 }
 
-getSIPreturns <- function(simpleReturnZoo){
+calculateSIPreturns <- function(simpleReturnZoo){
   monthStarts = as.Date(seq((as.yearmon(min(attributes(simpleReturnZoo)$index)) + 1/12), (as.yearmon(max(attributes(simpleReturnZoo)$index))) , 1/12))
   sipReturnList = lapply(as.list(monthStarts) , function(x) { cumprod(1 + simpleReturnZoo[index(simpleReturnZoo) >= x[1]]) } )
   sipReturnCum = do.call("merge",sipReturnList)

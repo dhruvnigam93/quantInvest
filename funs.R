@@ -5,7 +5,8 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   html = read_html(urlAmfi)
   dataScrape = html_nodes(html , "table")
   
-  navDf = html_table(dataScrape[[4]]) 
+  navDf = tryCatch({html_table(dataScrape[[4]]) } , error = function(e){ NA })
+  if(is.na(navDf))stop(paste("Data not available for fund at",urlAmfi ) )
   navDf = navDf[-(1:5),c(1,4)]
   names(navDf) = c("nav" , "date")
   
@@ -85,4 +86,21 @@ logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asi
 logNameFileName = gsub("data","mfNames" , logDataFileName)
 write.csv(as.data.frame(perfData$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
 write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
+}
+
+#### Post processing function ####
+postProcessFolioReturns <- function(folioReturns){
+  
+  meanRet = mean(folioReturns , na.rm = T)
+  sdRet = sd(folioReturns, na.rm = T)
+  sharpeRatio = meanRet/sdRet
+  avgDrawdown = NA
+  
+  metricTable = data.frame( c("Average Return","Average Volatility","Sharpe Ratio","Average Drawdown Time") ,
+                            c(meanRet ,sdRet ,  sharpeRatio , avgDrawdown) )
+  
+  plot_historic = plot(cumprod(1 + folioReturns) ,main = "Historic Performance")
+  
+  
+  return(list(metricTable , plot_historic))
 }
