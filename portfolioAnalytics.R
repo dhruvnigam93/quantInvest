@@ -8,7 +8,7 @@ getHistoricPerfLump <- function(mfNames , weights, schemeCodes){
   returnZoo <- getSimpleHistoricReturns(portDF)
   pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
   
-  processedResults = postProcessFolioReturns(pf_rebal$returns)
+  processedResults = postProcessFolioReturns(cumprod(1 + pf_rebal$returns))
   return(list(numericMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 

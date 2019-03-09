@@ -55,8 +55,8 @@ server <- function(input, output) {
       } else{
         perfData = getHistoricPerfLump(mfNames, c(0.5,0.5),schemeCodes)
       }
-      assign("perfData", "perfData", envir = .GlobalEnv)
-      writeLog()
+      assign(x = "perfData", value = perfData, envir = .GlobalEnv)
+      if(Sys.info()[1] == "Darwin") {writeLog()} ## write log only on local machine
       perfData$plot_historic
     })
   })

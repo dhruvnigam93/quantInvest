@@ -12,6 +12,9 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   
   navDf$date = as.Date(navDf$date , format = "%d-%b-%Y")
   navDf$nav = as.numeric(navDf$nav)
+  
+  navDf = navDf[is.finite(navDf$nav) & (navDf$nav != 0) , ]
+  
   return(navDf)
 }
 
@@ -82,6 +85,7 @@ reverseGrep <- function(mianStr, matchStrs){
 
 writeLog <- function(){
 print(environment())
+str(perfData)
 logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
 logNameFileName = gsub("data","mfNames" , logDataFileName)
 write.csv(as.data.frame(perfData$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
@@ -99,8 +103,8 @@ postProcessFolioReturns <- function(folioReturns){
   metricTable = data.frame( c("Average Return","Average Volatility","Sharpe Ratio","Average Drawdown Time") ,
                             c(meanRet ,sdRet ,  sharpeRatio , avgDrawdown) )
   
-  plot_historic = plot(cumprod(1 + folioReturns) ,main = "Historic Performance")
+  plot_historic = plot(folioReturns ,main = "Historic Performance")
   
   
-  return(list(metricTable , plot_historic))
+  return(list(metricTable = metricTable , plot_historic = plot_historic))
 }
