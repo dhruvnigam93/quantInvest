@@ -1,5 +1,5 @@
 # quantInvest
-A quant investing tool built in R
+A quant investing tool built in R. A nascent version can be found at https://dhruvnigam.shinyapps.io/quantinvest/. 
 
 ## Understanding you MF portfolio quantitatively
 In investing, it is essential too be able to look at the performance of your portfolio as a whole. At the time of writing this, there are no popular tools *I could find* available for a retail investor to be able to do that. The main objectives for this project are to enable investors to- 
