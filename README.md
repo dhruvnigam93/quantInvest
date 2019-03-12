@@ -13,6 +13,7 @@ This tool is mean to simulated your investment strategy using past data. Althoug
 * volatility, which quantifies the variability of returns you can expect from the portfolio
 * average drawdown - gives you an idea of how long an average your invesment can go down from a peak, before recovering.
 * Shape ratio - a measure incorporating both return and volatility 
+* Correlations between different funds in your portfolio. This helps in quantifying the actual "diversification" that is being achieved by the portfolio
 
 The investment strategy itself can be one of two popular ones-
 
