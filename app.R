@@ -46,14 +46,16 @@ server <- function(input, output) {
   observeEvent(input$do , {
     output$histPerfPlot <- renderPlot({
       mfNames = isolate(c(input$mf1 , input$mf2))
+      capital = isolate(c(input$w1 , input$w2))
       modeInvest = isolate( ifelse(input$investmentMode=="Monthly SIP", 1,0) )
+      rebalPeriod  = isolate(input$rebalancePeriod)
       
       if(any(duplicated(mfNames))) stop("Multiple entries for same fund") ## Throw error if multiple entries for same fund
       
       if(modeInvest == 1){
-        perfData = getHistoricPerfSIP(mfNames, c(0.5,0.5),schemeCodes)
+        perfData = getHistoricPerfSIP(mfNames, capital,schemeCodes , rebalPeriod)
       } else{
-        perfData = getHistoricPerfLump(mfNames, c(0.5,0.5),schemeCodes)
+        perfData = getHistoricPerfLump(mfNames, capital,schemeCodes , rebalPeriod)
       }
       assign(x = "perfData", value = perfData, envir = .GlobalEnv)
       if(Sys.info()[1] == "Darwin") {writeLog()} ## write log only on local machine

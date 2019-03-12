@@ -1,26 +1,28 @@
 #### Historic Portfolio Performance Lumpsum ####
-getHistoricPerfLump <- function(mfNames , weights, schemeCodes){
+getHistoricPerfLump <- function(mfNames , capital, schemeCodes , rebalPeriod){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
 
     print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
   
   returnZoo <- getSimpleHistoricReturns(portDF)
-  pf_rebal <- Return.portfolio(returnZoo, weights = weights, rebalance_on = "months", verbose = TRUE )
+  pf_rebal <- Return.portfolio(returnZoo, weights = capital/sum(capital), rebalance_on = getRebalCode(rebalPeriod), verbose = TRUE )
   
   processedResults = postProcessFolioReturns(cumprod(1 + pf_rebal$returns))
   return(list(numericMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 
 #### Historic Portfolio Performance SIP####
-getHistoricPerfSIP <- function(mfNames , weights, schemeCodes){
+getHistoricPerfSIP <- function(mfNames , capital, schemeCodes , rebalPeriod){
   
   portDF = merge(data.frame(mfNames) , schemeCodes , by.x = "mfNames" , by.y = "Scheme Name")
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
-  returnZoo <- getSimpleHistoricReturns(portDF)
+  returnZoo <- getSimpleHistoricReturns(portDF)  ## Simple historic returns for individual funds
   
   sipPortfolioReturnsList <- lapply(as.list(returnZoo) , calculateSIPreturns)
-  sipPortfolioReturnZoo = do.call("merge",sipPortfolioReturnsList)
+  sipPortfolioReturnZoo = do.call("merge",sipPortfolioReturnsList) ## SIP returns for individual funds
+  
+  
   
   sipTotalReturn = zoo(rowSums(sipPortfolioReturnZoo , na.rm = T) , time(sipPortfolioReturnZoo))
   processedResults = postProcessFolioReturns(sipTotalReturn)

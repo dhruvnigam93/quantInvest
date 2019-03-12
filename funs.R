@@ -18,6 +18,14 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   return(navDf)
 }
 
+getRebalCode <- function(rebalPeriod){
+  map = data.frame( strings = c("Yearly", "Monthly" , "Never") , 
+                    codes = c("years", "months" , NA), stringsAsFactors = F )
+  code = map[map$strings ==rebalPeriod, ]$codes
+  
+  return(code)
+}
+
 formatDate = function(date){
   if(substr(format(date , "%d-%h-%Y") , 0,1)=="0"){
     dateStr = substr(format(date , "%d-%h-%Y") , 2,11)
