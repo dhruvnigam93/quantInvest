@@ -8,7 +8,7 @@ getHistoricPerfLump <- function(mfNames , capital, schemeCodes , rebalPeriod){
   returnZoo <- getSimpleHistoricReturns(portDF)
   pf_rebal <- Return.portfolio(returnZoo, weights = capital/sum(capital), rebalance_on = getRebalCode(rebalPeriod), verbose = TRUE )
   
-  processedResults = postProcessFolioReturns(cumprod(1 + pf_rebal$returns))
+  processedResults = postProcessFolioReturns(cumprod(1 + pf_rebal$returns)*(sum(capital)))
   return(list(numericMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 
@@ -19,10 +19,9 @@ getHistoricPerfSIP <- function(mfNames , capital, schemeCodes , rebalPeriod){
   print(paste("Getting data from scheme Codes" , paste(portDF$`Scheme Code`, collapse = ",")))
   returnZoo <- getSimpleHistoricReturns(portDF)  ## Simple historic returns for individual funds
   
-  sipPortfolioReturnsList <- lapply(as.list(returnZoo) , calculateSIPreturns)
+  sipPortfolioReturnsList <- lapply(as.list(returnZoo) , calculateSIPreturns)  ## get dollar return for SIp stratefy for each fund
+  sipPortfolioReturnsList <- productListVec(sipPortfolioReturnsList , capital)  ## scale by capital
   sipPortfolioReturnZoo = do.call("merge",sipPortfolioReturnsList) ## SIP returns for individual funds
-  
-  
   
   sipTotalReturn = zoo(rowSums(sipPortfolioReturnZoo , na.rm = T) , time(sipPortfolioReturnZoo))
   processedResults = postProcessFolioReturns(sipTotalReturn)

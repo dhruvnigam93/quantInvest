@@ -18,6 +18,17 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   return(navDf)
 }
 
+productListVec <- function(xList,  yVec){
+  
+  if(length(xList) != length(yVec)){stop("Unequal lengths")}
+  
+  for(i in 1:length(xList)){
+    xList[[i]] = xList[[i]]*yVec[i]
+  }
+  
+  return(xList)
+}
+
 getRebalCode <- function(rebalPeriod){
   map = data.frame( strings = c("Yearly", "Monthly" , "Never") , 
                     codes = c("years", "months" , NA), stringsAsFactors = F )
@@ -92,12 +103,12 @@ reverseGrep <- function(mianStr, matchStrs){
 }
 
 writeLog <- function(){
-print(environment())
-str(perfData)
-logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
-logNameFileName = gsub("data","mfNames" , logDataFileName)
-write.csv(as.data.frame(perfData$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
-write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
+  print(environment())
+  str(perfData)
+  logDataFileName = paste0(format(Sys.time() , format = "%Y%m%d_%H%M%S", tz = "Asia/Kolkata") , "data.csv")
+  logNameFileName = gsub("data","mfNames" , logDataFileName)
+  write.csv(as.data.frame(perfData$pfRetrns) , file = paste0("/Users/dhruv/Documents/data audit/",logDataFileName))
+  write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
 }
 
 #### Post processing function ####
