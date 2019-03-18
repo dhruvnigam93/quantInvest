@@ -35,7 +35,10 @@ ui <- fluidPage(
     
     # Create a spot for the barplot
     mainPanel(
-      plotOutput(outputId = "histPerfPlot")  
+      tabsetPanel(type = "tabs",
+                  tabPanel("Historical Performance", plotOutput("histPlot")),
+                  tabPanel("Expected Future Performance", verbatimTextOutput("summary"))
+                  )
     )
     
   )
@@ -59,7 +62,9 @@ server <- function(input, output) {
       }
       assign(x = "perfData", value = perfData, envir = .GlobalEnv)
       if(Sys.info()[1] == "Darwin") {writeLog()} ## write log only on local machine
-      perfData$plot_historic
+      output$histPlot = perfData$plot_historic
+      
+      output$expectedPerf = getExpectedPerformance(capital = capital , mean_return =)
     })
   })
   

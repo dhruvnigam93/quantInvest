@@ -56,18 +56,23 @@ calculateSIPreturns <- function(simpleReturnZoo){
 }
 
 
-# #### Portfolio Projections ####
-# n = 5 # Holding period in years
-# 
-# nDays = (1:(n*252))
-# nYears = nDays/252
-# projectedAvgRet = (1 +mean_return)^nDays
-# projecctedSd = sqrt((1 + (sd_return)^2)^nDays - 1)
-# 
-# predFrame = data.frame(years = nYears , return = projectedAvgRet , yhigh = projectedAvgRet + projecctedSd, ylow = projectedAvgRet - projecctedSd)
-# 
-# pl = ggplot(predFrame , aes(x = years , y = return)) + geom_line() + 
-#   geom_ribbon(data = predFrame , aes(ymin = ylow , ymax = yhigh) , alpha = 0.3)
-# 
-# 
+#### Portfolio Projections ####
+
+getExpectedPerformance <- function(capital ,mean_return , sd_return , n = 5){
+
+nDays = (1:(n*252))
+nYears = nDays/252
+projectedAvgRet = ((1 +mean_return)^nDays)*capital
+projecctedSd = (sqrt((1 + (sd_return)^2)^nDays - 1))*capital
+
+predFrame = data.frame(years = nYears , return = projectedAvgRet , yhigh = projectedAvgRet + projecctedSd, ylow = projectedAvgRet - projecctedSd)
+
+pl = ggplot(predFrame , aes(x = years , y = return)) + geom_line() +
+  geom_ribbon(data = predFrame , aes(ymin = ylow , ymax = yhigh) , alpha = 0.3)
+
+return(pl)
+
+}
+
+
 
