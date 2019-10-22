@@ -33,18 +33,18 @@ ui <- fluidPage(
       actionButton("do", "update")
     ),
     
-    # Create a spot for the barplot
+    # Create a spot for the plot
     mainPanel(
       tabsetPanel(type = "tabs",
                   tabPanel("Historical Performance", plotOutput("histPlot")),
-                  tabPanel("Expected Future Performance", verbatimTextOutput("summary"))
+                  tabPanel("Expected Future Performance", plotOutput("expectedPerf"))
                   )
     )
     
   )
 )
 
-#### Define server logic to plot various variables against mpg #### 
+#### Define server logic to plot historic performance for given portfolio #### 
 server <- function(input, output) {
   observeEvent(input$do , {
     output$histPerfPlot <- renderPlot({
@@ -64,10 +64,12 @@ server <- function(input, output) {
       if(Sys.info()[1] == "Darwin") {writeLog()} ## write log only on local machine
       output$histPlot = perfData$plot_historic
       
-      output$expectedPerf = getExpectedPerformance(capital = capital , mean_return =)
+      output$expectedPerf = getExpectedPerformance(capital = capital , 
+                                                   mean_return = perfData$numericMetrics$values[1] ,
+                                                   sd_return = perfData$numericMetrics$values[2]  , n = 3)
     })
   })
   
 }
 
-shinyApp(ui, server)
+shinyApp(ui, server) # launch app

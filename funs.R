@@ -1,3 +1,4 @@
+## Get historic NAV for a given fund
 getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   
   urlAmfi = paste0("http://portal.amfiindia.com/NavHistoryReport_Rpt_Po.aspx?rpt=1&frmdate=",formatDate(startDate),"&todate=",
@@ -18,9 +19,10 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   return(navDf)
 }
 
+
 productListVec <- function(xList,  yVec){
   
-  if(length(xList) != length(yVec)){stop("Unequal lengths")}
+  if(length(xList) != length(yVec)){stop("Unequal lengths")} # throw unequal length error
   
   for(i in 1:length(xList)){
     xList[[i]] = xList[[i]]*yVec[i]
@@ -29,6 +31,7 @@ productListVec <- function(xList,  yVec){
   return(xList)
 }
 
+## Mapping for rebal frequency inout
 getRebalCode <- function(rebalPeriod){
   map = data.frame( strings = c("Yearly", "Monthly" , "Never") , 
                     codes = c("years", "months" , NA), stringsAsFactors = F )
@@ -37,6 +40,7 @@ getRebalCode <- function(rebalPeriod){
   return(code)
 }
 
+### Format date
 formatDate = function(date){
   if(substr(format(date , "%d-%h-%Y") , 0,1)=="0"){
     dateStr = substr(format(date , "%d-%h-%Y") , 2,11)
@@ -46,6 +50,7 @@ formatDate = function(date){
   return(dateStr)
 }
 
+## Scrape all current scheme code from AMFI site
 getAllSchemeCodes <- function(){
   url = "https://www.amfiindia.com/spages/NAVOpen.txt"
   allFundsData = read.delim(file = url, header = FALSE, sep = "\t", dec = ".",stringsAsFactors = F)
@@ -61,6 +66,8 @@ getAllSchemeCodes <- function(){
   return(DF)
 }
 
+
+## Load MF codes saved in csv in the working directory 
 getMFcodes <- function(){
   mfCodes = read.csv("fundCodes.csv" , stringsAsFactors = F , header = T)
   mfCodes$Fund.house = gsub("amp;","",mfCodes$Fund.house)
@@ -75,13 +82,9 @@ getMFcodes <- function(){
 getAllSchemeMFCodes <- function(){
   schemeCodes = getAllSchemeCodes()
   mfCodes = getMFcodes()
-  
   schemeMFs = sapply(schemeCodes$`Scheme Name` , function(x) ( reverseGrep(x , mfCodes$Fund.house) ))
-  
   schemeCodes$mfName = schemeMFs
-  
   schemeCodesMfCodes = merge(schemeCodes , mfCodes , by.x = "mfName", by.y = "Fund.house",all.x = T)
-  
   return(schemeCodesMfCodes)
 }
 
@@ -102,6 +105,7 @@ reverseGrep <- function(mianStr, matchStrs){
   
 }
 
+## Logging function for app
 writeLog <- function(){
   print(environment())
   str(perfData)
@@ -111,7 +115,7 @@ writeLog <- function(){
   write.csv(schemeCodes[schemeCodes$`Scheme Name` %in% mfNames,] , file = paste0("/Users/dhruv/Documents/data audit/",logNameFileName))
 }
 
-#### Post processing function ####
+## Post processing function for performance
 postProcessFolioReturns <- function(folioReturns){
   
   meanRet = mean(folioReturns , na.rm = T)
@@ -123,7 +127,5 @@ postProcessFolioReturns <- function(folioReturns){
                             c(meanRet ,sdRet ,  sharpeRatio , avgDrawdown) )
   
   plot_historic = plot(folioReturns ,main = "Historic Performance")
-  
-  
   return(list(metricTable = metricTable , plot_historic = plot_historic))
 }

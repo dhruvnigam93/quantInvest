@@ -8,7 +8,8 @@ getHistoricPerfLump <- function(mfNames , capital, schemeCodes , rebalPeriod){
   returnZoo <- getSimpleHistoricReturns(portDF)
   pf_rebal <- Return.portfolio(returnZoo, weights = capital/sum(capital), rebalance_on = getRebalCode(rebalPeriod), verbose = TRUE )
   
-  processedResults = postProcessFolioReturns(cumprod(1 + pf_rebal$returns)*(sum(capital)))
+  processedResults = summaryMetrics(pf_rebal$returns , capital)
+  outputPlot = getOutputPlot(pf_rebal, capital)
   return(list(numericMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(returnZoo , pf_rebal$returns)))
 }
 
@@ -57,10 +58,9 @@ calculateSIPreturns <- function(simpleReturnZoo){
 
 
 #### Portfolio Projections ####
-
 getExpectedPerformance <- function(capital ,mean_return , sd_return , n = 5){
 
-nDays = (1:(n*252))
+nDays = (1:(n*252)) 
 nYears = nDays/252
 projectedAvgRet = ((1 +mean_return)^nDays)*capital
 projecctedSd = (sqrt((1 + (sd_return)^2)^nDays - 1))*capital
