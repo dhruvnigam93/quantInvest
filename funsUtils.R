@@ -69,7 +69,7 @@ getAllSchemeCodes <- function(){
 
 ## Load MF codes saved in csv in the working directory 
 getMFcodes <- function(){
-  mfCodes = read.csv("fundCodes.csv" , stringsAsFactors = F , header = T)
+  mfCodes = read.csv("data/fundCodes.csv" , stringsAsFactors = F , header = T)
   mfCodes$Fund.house = gsub("amp;","",mfCodes$Fund.house)
   mfCodes$Fund.house = gsub(" Mutual Fund","",mfCodes$Fund.house)
   mfCodes$Fund.house = gsub("Franklin Templeton","Franklin",mfCodes$Fund.house)

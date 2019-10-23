@@ -1,4 +1,4 @@
-#### App script - run to launch app
+#### App script to launch app
 library(shiny)
 library(rvest)
 library(PortfolioAnalytics)
@@ -38,7 +38,7 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(type = "tabs",
                   tabPanel("Historical Performance", plotOutput("histPlot")),
-                  tabPanel("Expected Future Performance", plotOutput("expectedPerf"))
+                  tabPanel("Expected Future Performance", plotOutput("histPlot"))
                   )
     )
     
@@ -53,7 +53,7 @@ server <- function(input, output) {
       capital = isolate(c(input$w1 , input$w2))
       modeInvest = isolate( ifelse(input$investmentMode=="Monthly SIP", 1,0) )
       rebalPeriod  = isolate(input$rebalancePeriod)
-      
+
       if(any(duplicated(mfNames))) stop("Multiple entries for same fund. Please chose different funds") ## Throw error if multiple entries for same fund
       
       if(modeInvest == 1){
@@ -65,7 +65,7 @@ server <- function(input, output) {
       if(Sys.info()[1] == "Darwin") {writeLog()} ## write log only on local machine
       output$histPlot = perfData$plot_historic
       
-      output$expectedPerf = getExpectedPerformance(capital = capital , 
+      output$expectedPerf = getExpectedPerformance(capital = capital ,
                                                    mean_return = perfData$numericMetrics$values[1] ,
                                                    sd_return = perfData$numericMetrics$values[2]  , n = 3)
     })
