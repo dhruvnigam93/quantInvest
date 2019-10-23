@@ -1,11 +1,12 @@
+#### App script - run to launch app
 library(shiny)
 library(rvest)
 library(PortfolioAnalytics)
-source('funs.R')
-source('portfolioAnalytics.R')
+source('funsUtils.R')
+source('portfolioAnalyticsUtils.R')
 schemeCodes = getAllSchemeMFCodes()
 
-# Use a fluid Bootstrap layout
+#### UI function ####
 ui <- fluidPage(    
   
   # Give the page a title
@@ -53,7 +54,7 @@ server <- function(input, output) {
       modeInvest = isolate( ifelse(input$investmentMode=="Monthly SIP", 1,0) )
       rebalPeriod  = isolate(input$rebalancePeriod)
       
-      if(any(duplicated(mfNames))) stop("Multiple entries for same fund") ## Throw error if multiple entries for same fund
+      if(any(duplicated(mfNames))) stop("Multiple entries for same fund. Please chose different funds") ## Throw error if multiple entries for same fund
       
       if(modeInvest == 1){
         perfData = getHistoricPerfSIP(mfNames, capital,schemeCodes , rebalPeriod)

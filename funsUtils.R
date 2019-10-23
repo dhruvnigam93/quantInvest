@@ -13,7 +13,7 @@ getHistNAV  = function(mfcode,scmCode , startDate , endDate){
   
   navDf$date = as.Date(navDf$date , format = "%d-%b-%Y")
   navDf$nav = as.numeric(navDf$nav)
-  
+
   navDf = navDf[is.finite(navDf$nav) & (navDf$nav != 0) , ]
   
   return(navDf)

@@ -29,6 +29,7 @@ getHistoricPerfSIP <- function(mfNames , capital, schemeCodes , rebalPeriod){
   return(list(nummercMetrics =processedResults$metricTable ,plot_historic = processedResults$plot_historic , pfRetrns =  merge(sipPortfolioReturnZoo , sipTotalReturn)))
 }
 
+#### Simple historic returns for a data frme of funds
 getSimpleHistoricReturns <- function(mfDf){
   allNAV = list()
   for( i in 1:(nrow(mfDf))){
@@ -48,6 +49,7 @@ getSimpleHistoricReturns <- function(mfDf){
   
 }
 
+#### Calculating monthly returns for SIP in portfolio
 calculateSIPreturns <- function(simpleReturnZoo){
   monthStarts = as.Date(seq((as.yearmon(min(attributes(simpleReturnZoo)$index)) + 1/12), (as.yearmon(max(attributes(simpleReturnZoo)$index))) , 1/12))
   sipReturnList = lapply(as.list(monthStarts) , function(x) { cumprod(1 + simpleReturnZoo[index(simpleReturnZoo) >= x[1]]) } )
@@ -57,7 +59,7 @@ calculateSIPreturns <- function(simpleReturnZoo){
 }
 
 
-#### Portfolio Projections ####
+#### Portfolio Projections ploat for given metrics
 getExpectedPerformance <- function(capital ,mean_return , sd_return , n = 5){
 
 nDays = (1:(n*252)) 
